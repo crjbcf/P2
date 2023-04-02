@@ -7,6 +7,7 @@
 
 #include "scanner.h"
 #include "token.h"
+#include "node.h"
 #include "scanner.cpp"
 #include <fstream>
 #include <cstdlib>
@@ -16,7 +17,9 @@ using namespace std;
 extern int lineNum;
 extern fstream file;
 
-void parser(fstream &file);
+node_t* parser(fstream &file);
+
+node_t* getNode(string label);
 
 void error();
 

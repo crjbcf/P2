@@ -16,6 +16,12 @@ C:/Users/chris/CLionProjects/P2(new)/parser.h
 parser.cpp
 C:/Users/chris/CLionProjects/P2(new)/parser.cpp
 
+C:/Users/chris/CLionProjects/P2(new)/node.h
+scanner.h
+C:/Users/chris/CLionProjects/P2(new)/scanner.h
+vector
+-
+
 C:/Users/chris/CLionProjects/P2(new)/parser.cpp
 parser.h
 C:/Users/chris/CLionProjects/P2(new)/parser.h
@@ -25,6 +31,8 @@ scanner.h
 C:/Users/chris/CLionProjects/P2(new)/scanner.h
 token.h
 C:/Users/chris/CLionProjects/P2(new)/token.h
+node.h
+C:/Users/chris/CLionProjects/P2(new)/node.h
 scanner.cpp
 C:/Users/chris/CLionProjects/P2(new)/scanner.cpp
 fstream

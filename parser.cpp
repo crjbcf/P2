@@ -10,6 +10,15 @@ fstream file;
 
 int lineNum = 1;
 
+
+node_t* getNode(string label)
+{
+    node_t* node = new node_t;
+    node->label = label;
+
+    return node;
+}
+
 void error() {
     cout << "There was an error.";
     cout << "\ntoken: " << tk.tokenInstance << " line number: " << lineNum;
@@ -17,42 +26,53 @@ void error() {
 }
 
 //<K> -> t1 || t3
-void K()
+node_t* K()
 {
+    node_t* p = getNode("K");
+
     if (tk.tokenID == T1_tk)
     {
+        p->tokens.push_back(tk);
         tk = scanner(file, lineNum);
+        return p;
     }
     else if (tk.tokenID == T3_token)
     {
+        p->tokens.push_back(tk);
         tk = scanner(file, lineNum);
+        return p;
     }
     else
     {
         error(); // expected T1 or T3
     }
+
+    return nullptr;
 }
 
 
 
 
 //<H> -> { || }
-void H()
+node_t* H()
 {
+    node_t* p = getNode("H");
     if (tk.tokenID == T2_token)
     {
         if (tk.tokenInstance == "{") //predict {
         {
+            p->tokens.push_back(tk);
             tk = scanner(file, lineNum);
 
-            return; //end of rule
+            return p; //end of rule
 
         }
         else if (tk.tokenInstance == "}")
         {
+            p->tokens.push_back(tk);
             tk = scanner(file, lineNum);
 
-            return; //end of rule
+            return p; //end of rule
         }
         else
         {
@@ -63,58 +83,66 @@ void H()
     {
         error(); //T2 expected
     }
+
+    return nullptr;
 }
 
 
 
 //<M> -> <K><H> || empty
-void M()
+node_t* M()
 {
     //kinda unsure what to do here....
     //gonna go based of current token
+    node_t* p = getNode("M");
     if (tk.tokenID == T1_tk || tk.tokenID == T3_token) //since Ks first set is t1 or t3
     {
-        K(); // predict K
+        p->child1 = K(); // predict K
 
-        H(); //predict H
+        p->child2 = H(); //predict H
 
-        return; //end of production
+        return p; //end of production
     }
     else
-        return; //empty?
+        return nullptr; //empty?
 
 }
 
 //<G> -> <K><M>
-void G()
+node_t* G()
 {
+    node_t* p = getNode("G");
 
-    K(); // predict K
+    p->child1 = K(); // predict K
 
-    M(); // predict M
+    p->child2 = M(); // predict M
 
-    return; //end of production rule
+    return p; //end of production rule
 }
 
 
 //<F> -> |<G>~
-void F()
+node_t* F()
 {
+    node_t* p = getNode("F");
+
     if (tk.tokenID == T2_token)
     {
         if (tk.tokenInstance == "|")
         {
+            p->tokens.push_back(tk);
             tk = scanner(file, lineNum);
 
-            G(); //predict G
+            p->child1 = G(); //predict G
 
             if (tk.tokenID == T2_token)
             {
                 if (tk.tokenInstance == "~")
                 {
+                    p->tokens.push_back(tk);
                     tk = scanner(file, lineNum);
 
-                    return; // end of production rule
+                    return p; // end of production rule
                 }
                 else
                 {
@@ -135,26 +163,32 @@ void F()
     {
         error(); //expected T2
     }
+
+    return nullptr;
 }
 
 //<E> -> ]<K>~
-void E()
+node_t* E()
 {
+    node_t* p = getNode("E");
+
     if (tk.tokenID == T2_token)
     {
         if (tk.tokenInstance == "]")
         {
+            p->tokens.push_back(tk);
             tk = scanner(file, lineNum);
 
-            K(); //predict K
+            p->child1 = K(); //predict K
 
             if (tk.tokenID == T2_token)
             {
                 if (tk.tokenInstance == "~")
                 {
+                    p->tokens.push_back(tk);
                     tk = scanner(file, lineNum);
 
-                    return; // end of production rule
+                    return p; // end of production rule
                 }
                 else
                 {
@@ -175,22 +209,29 @@ void E()
     {
         error(); //expected T2
     }
+
+    return nullptr;
 }
 
 //<D> -> [t1
-void D()
+node_t* D()
 {
+    node_t* p = getNode("D");
+
     if (tk.tokenID == T2_token) //predict T2
     {
         if (tk.tokenInstance == "[") //predict [
         {
+            p->tokens.push_back(tk);
+
             tk = scanner(file, lineNum);
 
             if (tk.tokenID == T1_tk) //predict T1
             {
+                p->tokens.push_back(tk);
                 tk = scanner(file, lineNum);
 
-                return;
+                return p;
             }
             else
             {
@@ -206,20 +247,25 @@ void D()
     {
         error();//expected T2
     }
+
+    return nullptr;
 }
 
 //<C> -> *<K>
-void C()
+node_t* C()
 {
+    node_t* p = getNode("C");
+
     if (tk.tokenID == T2_token)//* is a T2 token
     {
         if (tk.tokenInstance == "*")
         {
+            p->tokens.push_back(tk);
             tk = scanner(file, lineNum);
 
-            K(); //predicting K
+            p->child1 = K(); //predicting K
 
-            return; // end of production rule
+            return p; // end of production rule
         }
         else
         {
@@ -230,26 +276,30 @@ void C()
     {
         error(); //tk2 expected
     }
+
+    return nullptr;
 }
 
 //<L> -> <D>~ || <E>~ || <F>~ || empty
-void L()
+node_t* L()
 {
+    node_t* p = getNode("L");
     //first check for T2 token (first sets for non terms are all t2 tokens
     if (tk.tokenID == T2_token)
     {
         //check which instance it is which will decide which rule to follow
         if (tk.tokenInstance == "[") // choose D path
         {
-            D(); // predict D
+           p->child1 = D(); // predict D
 
             if (tk.tokenID = T2_token)
             {
                 if (tk.tokenInstance == "~")
                 {
+                    p->tokens.push_back(tk);
                     tk = scanner(file, lineNum);
 
-                    return; //end of rule
+                    return p; //end of rule
                 }
                 else
                 {
@@ -263,15 +313,16 @@ void L()
         }
         else if (tk.tokenInstance == "]") //E path
         {
-            E(); //predict E
+             p->child1 = E(); //predict E
 
             if (tk.tokenID = T2_token)
             {
                 if (tk.tokenInstance == "~")
                 {
+                    p->tokens.push_back(tk);
                     tk = scanner(file, lineNum);
 
-                    return; //end of rule
+                    return p; //end of rule
                 }
                 else
                 {
@@ -285,15 +336,16 @@ void L()
         }
         else if (tk.tokenInstance == "|") //F path
         {
-            F(); //predict f
+            p->child1 = F(); //predict f
 
             if (tk.tokenID = T2_token)
             {
                 if (tk.tokenInstance == "~")
                 {
+                    p->tokens.push_back(tk);
                     tk = scanner(file, lineNum);
 
-                    return; //end of rule
+                    return p; //end of rule
                 }
                 else
                 {
@@ -308,37 +360,41 @@ void L()
     }
     else
     {
-        return; //empty?
+        return nullptr; //empty?
     }
+    return nullptr;
 }
 
 
-void J()
+node_t* J()
 {
+    node_t* p = getNode("J");
     //first check for t1 or t2 in current token if not one of these we are in empty case
     if (tk.tokenID == T2_token) //its one of the first few rules
     {
         if (tk.tokenInstance == "*") //process C rule
         {
-            C(); //predict C
+            p->child1 = C(); //predict C
 
             if (tk.tokenID == T2_token)
             {
                 if (tk.tokenInstance == "~")
                 {
+                    p->tokens.push_back(tk);
                     tk = scanner(file, lineNum);
 
-                    J(); //predict J
+                    p->child2 = J(); //predict J
 
                     if (tk.tokenID == T2_token)
                     {
                         if (tk.tokenInstance == "~")
                         {
+                            p->tokens.push_back(tk);
                             tk = scanner(file, lineNum);
 
-                            L(); //predict L
+                            p->child3 = L(); //predict L
 
-                            return; //end of production rule 1
+                            return p; //end of production rule 1
                         }
                         else
                         {
@@ -364,17 +420,18 @@ void J()
         }
         else if (tk.tokenInstance == "[") //process <D> rule
         {
-            D(); //predict D
+            p->child1 = D(); //predict D
 
             if (tk.tokenID == T2_token)
             {
                 if (tk.tokenInstance == "~")
                 {
+                    p->tokens.push_back(tk);
                     tk = scanner(file, lineNum);
 
-                    J(); //predict J
+                    p->child2 = J(); //predict J
 
-                    return; //end of production 2
+                    return p ; //end of production 2
                 }
                 else
                 {
@@ -389,17 +446,18 @@ void J()
         }
         else if (tk.tokenInstance == "]") //process <E> rule
         {
-            E(); //predict E
+            p->child1 = E(); //predict E
 
             if (tk.tokenID == T2_token)
             {
                 if (tk.tokenInstance == "~")
                 {
+                    p->tokens.push_back(tk);
                     tk = scanner(file, lineNum);
 
-                    J(); //predict J
+                    p->child2 = J(); //predict J
 
-                    return; //end of rule 3
+                    return p; //end of rule 3
                 }
                 else
                 {
@@ -418,17 +476,18 @@ void J()
     }
     else if (tk.tokenID == T1_tk) //its the 4th rule
     {
-        F(); //predict F
+        p->child1 = F(); //predict F
 
         if (tk.tokenID == T2_token)
         {
             if (tk.tokenInstance == "~")
             {
+                p->tokens.push_back(tk);
                 tk = scanner(file, lineNum); //consume
 
-                J(); //predict J
+                p->child2 = J(); //predict J
 
-                return; //end of rule 4
+                return p; //end of rule 4
             }
             else
             {
@@ -443,26 +502,33 @@ void J()
     }
     else
     {
-        return; //empty?
+        return nullptr; //empty?
     }
+
+    return nullptr;
 }
 
 //A -> ^t1<A> || empty
-void A()
+node_t* A()
 {
     if (tk.tokenID == T2_token) //^ is a t2 token
     {
         if (tk.tokenInstance == "^") //make sure it is the expected ^
         {
+            node_t* p = getNode("A");
+
+            p->tokens.push_back(tk);
+
             tk = scanner(file, lineNum);
 
             if (tk.tokenID == T1_tk)
             {
+                p->tokens.push_back(tk);
                 tk = scanner(file, lineNum);
 
-                A(); //predicting A
+                p->child1 = A(); //predicting A
 
-                return;
+                return p;
             }
         }
         else
@@ -472,34 +538,39 @@ void A()
     }
     else
     {
-        return; //empty
+
+        return nullptr; //empty
     }
+
+    return nullptr;
 
 }
 
 
 // <S> -> <S> -> <A><J>
-void S()
+node_t* S()
 {
-    A(); //predicting A
+    node_t* p = getNode("S");
 
-    J(); //predicting J
+    p->child1 = A(); //predicting A
 
-    return; //end of production
+    p->child2 = J(); //predicting J
 
+    return p; //end of production
 }
 
 
-void parser(fstream &file)
+node_t* parser(fstream &file)
 {
+    node_t* root;
     tk = scanner(file, lineNum);
 
-    S(); //start with starting nonTerm S
+    root = S(); //start with starting nonTerm S
 
     if (tk.tokenID == EOF_token)
         cout << "Parse Success";
     else
         error();
 
-    return;
+    return root;
 }
