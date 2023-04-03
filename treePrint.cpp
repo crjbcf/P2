@@ -26,18 +26,19 @@ void traversePreorder(node_t* root, int level)
 
 void printNodeInfo(node_t* node, int level)
 {
-    cout << "here is a node";
+    string tokenNames[] = {"token_1", "token_2", "token_3", "EOF", "Scanner_Error"};
+    cout << setw(level * 4) << " " <<  node->label << ":";
 
 
-//    if (!node->tokens.empty())
-//    {
-//        for ( int i = 0; i < node->tokens.size(); i++)
-//        {
-//            Token token = node->tokens[i];
-//
-//            cout << token.tokenInstance;
-//        }
-//    }
+    if (!node->tokens.empty())
+    {
+        for ( int i = 0; i < node->tokens.size(); i++)
+        {
+            Token token = node->tokens[i];
+
+            cout << tokenNames[token.tokenID] << " " << token.tokenInstance << " ";
+        }
+    }
 
     cout << endl;
 }
