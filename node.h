@@ -13,11 +13,11 @@ struct node_t
     string label;
     vector<Token> tokens;
 
-    node_t* child1;
-    node_t* child2;
-    node_t* child3;
-    node_t* child4;
-    node_t* child5;
+    node_t* child1  = nullptr;
+    node_t* child2 = nullptr;
+    node_t* child3 = nullptr;
+    node_t* child4 = nullptr;
+    node_t* child5 = nullptr;
 };
 
 #endif //P2_NEW__NODE_H

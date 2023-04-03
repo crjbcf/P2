@@ -14,8 +14,10 @@
 #include <iostream>
 using namespace std;
 
+
+
 extern int lineNum;
-extern fstream file;
+
 
 node_t* parser(fstream &file);
 

@@ -2,14 +2,18 @@
 #include <fstream>
 #include "parser.h"
 #include "parser.cpp"
-
+#include "treePrint.h"
+#include "treePrint.cpp"
 
 using namespace std;
 
+
+
 int main(int argc, char* argv[])
 {
-    fstream inputFile;
     string filename = "C://Users//chris//CLionProjects//P2(new)//myRandom.txt";
+    int level = 0;
+    fstream inputFile;
 
 //    if (argc > 2)
 //    {
@@ -59,7 +63,8 @@ int main(int argc, char* argv[])
             inputFile.unget();
         }
 
-        parser(inputFile); //needs to be replaced with parser.
+        node_t* parseTree = parser(inputFile); //needs to be replaced with parser.
+        traversePreorder(parseTree, level);
     }
     else
     {

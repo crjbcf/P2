@@ -8,4 +8,6 @@ CMakeFiles/P2_new_.dir/main.cpp.obj: ../parser.h
 CMakeFiles/P2_new_.dir/main.cpp.obj: ../scanner.cpp
 CMakeFiles/P2_new_.dir/main.cpp.obj: ../scanner.h
 CMakeFiles/P2_new_.dir/main.cpp.obj: ../token.h
+CMakeFiles/P2_new_.dir/main.cpp.obj: ../treePrint.cpp
+CMakeFiles/P2_new_.dir/main.cpp.obj: ../treePrint.h
 
