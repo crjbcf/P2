@@ -4,6 +4,7 @@
 
 #include "treePrint.h"
 
+
 void traversePreorder(node_t* root, int level)
 {
 
@@ -14,12 +15,10 @@ void traversePreorder(node_t* root, int level)
     else
     {
         printNodeInfo(root, level);
+        traversePreorder(root->child1, level+1);
+        traversePreorder(root->child2, level+1);
+        traversePreorder(root->child3, level+1);
     }
-
-
-    traversePreorder(root->child1, level+1);
-    traversePreorder(root->child2, level+1);
-    traversePreorder(root->child3, level+1);
 
 }
 
@@ -30,16 +29,16 @@ void printNodeInfo(node_t* node, int level)
     cout << setw(level * 4) << " " <<  node->label << ":";
 
 
+
     if (!node->tokens.empty())
     {
         for ( int i = 0; i < node->tokens.size(); i++)
         {
             Token token = node->tokens[i];
 
-            cout << tokenNames[token.tokenID] << " " << token.tokenInstance << " ";
+                cout << endl << setw(level * 4) << " " << "  " << tokenNames[token.tokenID] << " " << token.tokenInstance;
         }
     }
-
     cout << endl;
 }
 

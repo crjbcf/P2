@@ -14,18 +14,10 @@
 #include <iostream>
 using namespace std;
 
-
-
 extern int lineNum;
-
-
 node_t* parser(fstream &file);
-
 node_t* getNode(string label);
 
 void error();
-
-
-
 
 #endif //P2_NEW__PARSER_H

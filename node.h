@@ -16,8 +16,7 @@ struct node_t
     node_t* child1  = nullptr;
     node_t* child2 = nullptr;
     node_t* child3 = nullptr;
-    node_t* child4 = nullptr;
-    node_t* child5 = nullptr;
+
 };
 
 #endif //P2_NEW__NODE_H

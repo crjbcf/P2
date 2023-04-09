@@ -45,6 +45,7 @@ node_t* K(fstream& file)
     }
     else
     {
+        cout << "Expected token 1 or token 3\n";
         error(); // expected T1 or T3
     }
     return nullptr;
@@ -73,6 +74,7 @@ node_t* H(fstream& file)
     }
     else
     {
+        cout << "Expected token 2\n";
         error(); //T2 expected
     }
     return nullptr;
@@ -83,8 +85,6 @@ node_t* H(fstream& file)
 //<M> -> <K><H> || empty
 node_t* M(fstream& file)
 {
-    //kinda unsure what to do here....
-    //gonna go based of current token
     node_t* p = getNode("M");
     if (tk.tokenID == 0 || tk.tokenID == 2) //since Ks first set is t1 or t3
     {
@@ -96,7 +96,7 @@ node_t* M(fstream& file)
     }
     else
     {
-        return nullptr;
+        return p;//empty
     }
 }
 
@@ -128,18 +128,20 @@ node_t* F(fstream& file)
 
         if (tk.tokenID == 1 && tk.tokenInstance == "~")
         {
-            p->tokens.push_back(tk);
+           // p->tokens.push_back(tk);
             tk = scanner(file, lineNum);
 
             return p; // end of production rule
         }
         else
         {
+            cout << "Expected token 2 '~'";
             error(); //expected T2
         }
     }
     else
     {
+        cout << "Expected token 2 '|'";
         error(); //expected T2
     }
 
@@ -161,18 +163,20 @@ node_t* E(fstream& file)
 
         if (tk.tokenID == 1 && tk.tokenInstance == "~")
         {
-            p->tokens.push_back(tk);
+            //p->tokens.push_back(tk);
             tk = scanner(file, lineNum);
 
             return p; // end of production rule
         }
         else//keep this error maybe
         {
+            cout << "Expected token 2 '~'";
             error(); //expected T2
         }
     }
     else //keep this error
     {
+        cout << "Expected token 2 ']'";
         error(); //expected T2
     }
 
@@ -198,11 +202,13 @@ node_t* D(fstream& file)
         }
         else
         {
+            cout << "Expected token 1\n";
             error(); //expected T1
         }
     }
     else
     {
+        cout << "Expected token 2 '['\n";
         error();//expected T2
     }
 
@@ -223,6 +229,11 @@ node_t* C(fstream& file)
 
         return p; // end of production rule
     }//maybe error here
+    else
+    {
+        cout << "Expected token 2 '*'";
+        error();
+    }
     return nullptr;
 }
 
@@ -231,83 +242,62 @@ node_t* L(fstream& file)
 {
     node_t* p = getNode("L");
     //first check for T2 token (first sets for non terms are all t2 tokens
-    if (tk.tokenID == 1)
+    if (tk.tokenID == 1 && tk.tokenInstance == "[")
     {
-        //check which instance it is which will decide which rule to follow
-        if (tk.tokenInstance == "[") // choose D path
+       p->child1 = D(file); // predict D
+
+        if (tk.tokenID == 1 && tk.tokenInstance == "~")
         {
-           p->child1 = D(file); // predict D
+            //p->tokens.push_back(tk); //dnt save
+            tk = scanner(file, lineNum); //consume
 
-            if (tk.tokenID == 1)
-            {
-                if (tk.tokenInstance == "~")
-                {
-                    p->tokens.push_back(tk);
-                    tk = scanner(file, lineNum);
-
-                    return p; //end of rule
-                }
-                else
-                {
-                    error(); //expected ~
-                }
-            }
-            else
-            {
-                error(); //expected T2
-            }
+            return p; //end of rule
         }
-        else if (tk.tokenInstance == "]") //E path
+        else
         {
-            p->child1 = E(file); //predict E
-
-            if (tk.tokenID == 1)
-            {
-                if (tk.tokenInstance == "~")
-                {
-                    p->tokens.push_back(tk);
-                    tk = scanner(file, lineNum);
-
-                    return p; //end of rule
-                }
-                else
-                {
-                    error(); //expected ~
-                }
-            }
-            else
-            {
-                error(); //expected T2
-            }
+            cout << "Expected token 2 '~'";
+            error(); //expected ~
         }
-        else if (tk.tokenInstance == "|") //F path
+    }
+    else if (tk.tokenID == 1 && tk.tokenInstance == "]") //E path
+    {
+        p->child1 = E(file); //predict E
+
+        if (tk.tokenID == 1 && tk.tokenInstance == "~")
         {
-            p->child1 = F(file); //predict f
+            //p->tokens.push_back(tk);
+            tk = scanner(file, lineNum);
 
-            if (tk.tokenID == 1)
-            {
-                if (tk.tokenInstance == "~")
-                {
-                    p->tokens.push_back(tk);
-                    tk = scanner(file, lineNum);
+            return p; //end of rule
+        }
+        else
+        {
+            cout << "Expected token 2 '~' \n";
+            error(); //expected ~
+        }
+    }
+    else if (tk.tokenID == 1 && tk.tokenInstance == "|") //F path
+    {
+        p->child1 = F(file); //predict f
 
-                    return p; //end of rule
-                }
-                else
-                {
-                    error(); //expected ~
-                }
-            }
-            else
-            {
-                error(); //expected T2
-            }
+        if (tk.tokenID == 1 && tk.tokenInstance == "~")
+        {
+            //p->tokens.push_back(tk);
+            tk = scanner(file, lineNum);
+
+            return p; //end of rule
+        }
+        else
+        {
+            cout << "Expected token 2 '~' \n";
+            error(); //expected ~
         }
     }
     else
     {
-        return nullptr; //empty?
+        return p; //empty token
     }
+
     return nullptr;
 }
 
@@ -322,7 +312,7 @@ node_t* J(fstream &file)
 
         if (tk.tokenID == 1 && tk.tokenInstance == "~")
         {
-            p->tokens.push_back(tk);
+            //p->tokens.push_back(tk);
             tk = scanner(file, lineNum);
 
             p->child2 = J(file); //predict J
@@ -330,14 +320,24 @@ node_t* J(fstream &file)
             if (tk.tokenID == 1 && tk.tokenInstance == "~")
             {
 
-                p->tokens.push_back(tk);
+                //p->tokens.push_back(tk);
                 tk = scanner(file, lineNum);
 
                 p->child3 = L(file); //predict L
 
                 return p; //end of production rule 1
             }//maybe else error here
+            else
+            {
+                cout << "Expected token 2 '~'\n";
+                error();//expected ~
+            }
         }//maybe else error here
+        else
+        {
+            cout << "Expected token 2 '~' \n";
+            error(); //expected ~
+        }
     }
     else if (tk.tokenID == 1 && tk.tokenInstance == "[") //process <D> rule
     {
@@ -345,13 +345,18 @@ node_t* J(fstream &file)
 
         if (tk.tokenID == 1 && tk.tokenInstance == "~")
         {
-            p->tokens.push_back(tk);
+            //p->tokens.push_back(tk);
             tk = scanner(file, lineNum);
 
             p->child2 = J(file); //predict J
 
             return p ; //end of production 2
-        }//error here
+        }
+        else
+        {
+            cout << "Expected token 2 '~'\n";
+            error();
+        }
     }
     else if (tk.tokenID == 1 && tk.tokenInstance == "]") //process <E> rule
     {
@@ -359,13 +364,18 @@ node_t* J(fstream &file)
 
         if (tk.tokenID == 1 && tk.tokenInstance == "~")
         {
-            p->tokens.push_back(tk);
+            //p->tokens.push_back(tk);
             tk = scanner(file, lineNum);
 
             p->child2 = J(file); //predict J
 
             return p; //end of rule 3
-        }//error here
+        }
+        else
+        {
+            cout << "Expected token 2 '~' \n";
+            error();
+        }
     }
     else if (tk.tokenID == 0) //its the 4th rule
     {
@@ -377,25 +387,28 @@ node_t* J(fstream &file)
         if (tk.tokenID == 1 && tk.tokenInstance == "~")
         {
 
-            p->tokens.push_back(tk);
+            //p->tokens.push_back(tk);
             tk = scanner(file, lineNum); //consume
 
             p->child2 = J(file); //predict J
 
             return p; //end of rule 4
         }
+        else
+        {
+            cout << "Expected token 2 '~' \n";
+            error();
+        }
     }
     else
     {
-        return nullptr; //empty?
+        return p; //empty token
     }
 
-    cout << "returning null";
     return nullptr;
 }
 
 //A -> ^t1<A> || empty
-//fixed
 node_t* A(fstream &file)
 {
     node_t* p = getNode("A");
@@ -418,8 +431,10 @@ node_t* A(fstream &file)
     }
     else
     {
-        return nullptr; //empty
+
+        return p; //empty token
     }
+
 
     return nullptr;
 }
